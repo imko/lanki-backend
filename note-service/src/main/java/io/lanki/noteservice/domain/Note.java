@@ -50,7 +50,7 @@ public class Note {
 
   private Instant nextReviewDate;
 
-  @PositiveOrZero(message = "score must be defined")
+  @PositiveOrZero(message = "score must be greater than or equal to 0")
   @Max(100)
   private int score;
 
