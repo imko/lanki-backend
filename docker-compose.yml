@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    container_name: psql-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=lanki
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: pg_isready -U postgres -d lanki
+      interval: 10s
+      timeout: 3s
+      retries: 5
