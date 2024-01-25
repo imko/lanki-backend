@@ -33,7 +33,7 @@ public class NoteServiceTests {
   }
 
   @Test
-  @DisplayName("Test get a list of notes")
+  @DisplayName("Test get a list of notes with only one")
   public void testGetAllOnlyOne() {
     var note =
         Note.builder().title("title").content("content").type(NoteType.PERSONAL).score(100).build();
@@ -48,7 +48,7 @@ public class NoteServiceTests {
   }
 
   @Test
-  @DisplayName("Test get a list of notes")
+  @DisplayName("Test get a list of notes with more than one")
   public void testGetAllMoreThanOne() {
     var n1 =
         Note.builder()

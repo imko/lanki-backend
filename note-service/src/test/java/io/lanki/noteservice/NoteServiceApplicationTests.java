@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.lanki.noteservice.domain.Note;
 import io.lanki.noteservice.domain.Note.NoteType;
-import lombok.extern.slf4j.Slf4j;
+import io.lanki.noteservice.domain.NoteRepository;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,129 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
-@Slf4j
 class NoteServiceApplicationTests {
 
   @Autowired private WebTestClient webTestClient;
+
+  @Autowired private NoteRepository noteRepository;
+
+  @BeforeEach
+  public void setup() {
+    noteRepository.deleteAll();
+  }
+
+  @Test
+  @DisplayName("Test GET request for an empty list of notes")
+  public void testGetRequestAllEmpty() {
+    webTestClient
+        .get()
+        .uri("/v1/api/notes")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBodyList(Note.class)
+        .value(list -> assertThat(list).isEmpty());
+  }
+
+  @Test
+  @DisplayName("Test GET request for a list of notes with only one")
+  public void testGetRequestAllOnlyOne() {
+    var noteToCreate =
+        Note.builder().title("title").content("content").type(NoteType.PERSONAL).score(100).build();
+
+    Note expectedNote =
+        webTestClient
+            .post()
+            .uri("/v1/api/notes")
+            .bodyValue(noteToCreate)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(Note.class)
+            .value(note -> assertThat(note).isNotNull())
+            .returnResult()
+            .getResponseBody();
+
+    webTestClient
+        .get()
+        .uri("/v1/api/notes")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBodyList(Note.class)
+        .value(
+            list -> {
+              assertThat(list).hasSize(1);
+              assertThat(list.get(0).getTitle()).isEqualTo(expectedNote.getTitle());
+              assertThat(list.get(0).getContent()).isEqualTo(expectedNote.getContent());
+              assertThat(list.get(0).getType()).isEqualTo(expectedNote.getType());
+              assertThat(list.get(0).getScore()).isEqualTo(expectedNote.getScore());
+            });
+  }
+
+  @Test
+  @DisplayName("Test GET request for a list of notes with more than one")
+  public void testGetRequestAllMoreThanOne() {
+    var n1 =
+        Note.builder()
+            .title("title_1")
+            .content("content_1")
+            .type(NoteType.PERSONAL)
+            .score(100)
+            .build();
+    var n2 =
+        Note.builder()
+            .title("title_2")
+            .content("content_2")
+            .type(NoteType.LEETCODE)
+            .score(50)
+            .build();
+
+    Note e1 =
+        webTestClient
+            .post()
+            .uri("/v1/api/notes")
+            .bodyValue(n1)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(Note.class)
+            .value(note -> assertThat(note).isNotNull())
+            .returnResult()
+            .getResponseBody();
+    Note e2 =
+        webTestClient
+            .post()
+            .uri("/v1/api/notes")
+            .bodyValue(n2)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(Note.class)
+            .value(note -> assertThat(note).isNotNull())
+            .returnResult()
+            .getResponseBody();
+
+    webTestClient
+        .get()
+        .uri("/v1/api/notes")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBodyList(Note.class)
+        .value(
+            list -> {
+              assertThat(list).hasSize(2);
+              assertThat(
+                      list.stream()
+                          .filter(
+                              n ->
+                                  n.getTitle().equals(e1.getTitle())
+                                      || n.getTitle().equals(e2.getTitle()))
+                          .collect(Collectors.toList()))
+                  .hasSize(2);
+            });
+  }
 
   @Test
   @DisplayName("Test GET request when note ID already exists")
