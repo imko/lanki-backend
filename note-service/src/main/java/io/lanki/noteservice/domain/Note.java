@@ -1,5 +1,6 @@
 package io.lanki.noteservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -48,6 +49,7 @@ public class Note {
 
   private int reviews;
 
+  @JsonProperty("next_review_date")
   private Instant nextReviewDate;
 
   @PositiveOrZero(message = "score must be greater than or equal to 0")
@@ -57,9 +59,11 @@ public class Note {
   private String url;
 
   @CreatedDate
+  @JsonProperty("created_date")
   private Instant createdDate;
 
   @LastModifiedDate
+  @JsonProperty("last_modified_date")
   private Instant lastModifiedDate;
 
   @Version
