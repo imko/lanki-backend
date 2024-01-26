@@ -1,0 +1,67 @@
+server:
+  shutdown: graceful
+  port: 9090
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+spring:
+  application:
+    name: edge-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+  cloud:
+    gateway:
+      routes:
+        - id: note-route
+          uri: ${NOTE_SERVICE_URL:http://localhost:8080}/v1/api/notes
+          predicates:
+            - Path=/v1/api/notes/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: 
+                fallbackUri: forward:/note-service-fallback
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 5s
+        pool:
+          type: elastic
+          max-idle-time: 15s
+          max-life-time: 60s
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET
+            series: SERVER_ERROR # Retries only when 5XX errors
+            # Retries only when the given exceptions are thrown
+            exceptions: java.io.IOException, java.util.concurrent.TimeoutException
+            backoff:
+              firstBackoff: 50ms
+              maxBackOff: 500ms
+              factor: 2
+              basedOnPreviousValue: false
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      # Default config bean for all circuit breakers
+      default:
+        # Used to record the outcome of calls when circuit is closed.
+        slidingWindowSize: 20
+        # Number of permitted calls when circuit is half-open.
+        permittedNumberOfCallsInHalfOpenState: 5
+        # When failure rate is above the threshold, the circuit becomes open.
+        failureRateThreshold: 50
+        # Wait time before moving from open to half-open.
+        waitDurationInOpenState: 15000
+  # Default config bean for all time limiters.
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+
+logging:
+  level:
+    io.github.resilience4j: DEBUG
