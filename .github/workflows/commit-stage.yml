@@ -12,7 +12,7 @@ jobs:
     defaults:
       run:
         working-directory: note-service
-    name: Build and Test
+    name: Build and Test Note Service
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -34,7 +34,7 @@ jobs:
     defaults:
       run:
         working-directory: edge-service
-    name: Build and Test
+    name: Build and Test Edge Service
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -56,7 +56,7 @@ jobs:
     defaults:
       run:
         working-directory: note-service
-    name: Package and Publish
+    name: Package and Publish Note Service
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [ build ]
     runs-on: ubuntu-22.04
@@ -88,7 +88,7 @@ jobs:
     defaults:
       run:
         working-directory: edge-service
-    name: Package and Publish
+    name: Package and Publish Edge Service
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [ build ]
     runs-on: ubuntu-22.04
