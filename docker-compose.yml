@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  note-service:
+  lanki-note-service:
     depends_on:
-      - db
+      - lanki-db
     image: "ghcr.io/imko/lanki-backend/note-service:0.0.1-snapshot"
-    container_name: note-service
+    container_name: lanki-note-service
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -13,11 +13,11 @@ services:
       - BPL_JVM_THREAD_COUNT=50
       - BPL_DEBUG_ENABLED=true
       - BPL_DEBUG_PORT=8081
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql-db:5432/lanki
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://lanki-db:5432/lanki
 
-  db:
+  lanki-db:
     image: postgres
-    container_name: psql-db
+    container_name: lanki-db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -29,3 +29,9 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+
+  lanki-redis:
+    image: "redis:7.0"
+    container_name: lanki-redis
+    ports:
+      - "6379:6379"

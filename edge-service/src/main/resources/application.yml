@@ -20,7 +20,7 @@ spring:
           filters:
             - name: CircuitBreaker
               args:
-                name: 
+                name:
                 fallbackUri: forward:/note-service-fallback
       httpclient:
         connect-timeout: 2000
@@ -30,23 +30,43 @@ spring:
           max-idle-time: 15s
           max-life-time: 60s
       default-filters:
+        - SaveSession
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter:
+              # Number of tokens dripped in the bucket each second.
+              replenishRate: 10
+              burstCapacity: 20
+              # How many tokens a request costs.
+              requestedTokens: 1
         - name: Retry
           args:
             retries: 3
             methods: GET
-            series: SERVER_ERROR # Retries only when 5XX errors
-            # Retries only when the given exceptions are thrown
+            # Retries only when 5XX errors.
+            series: SERVER_ERROR
+            # Retries only when the given exceptions are thrown.
             exceptions: java.io.IOException, java.util.concurrent.TimeoutException
             backoff:
               firstBackoff: 50ms
               maxBackOff: 500ms
               factor: 2
               basedOnPreviousValue: false
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    port: 6379
+    timeout: 1s
+  session:
+    store-type: redis
+    timeout: 10m
+    redis:
+      namespace: lanki:edge
 
 resilience4j:
   circuitbreaker:
     configs:
-      # Default config bean for all circuit breakers
+      # Default config bean for all circuit breakers.
       default:
         # Used to record the outcome of calls when circuit is closed.
         slidingWindowSize: 20
