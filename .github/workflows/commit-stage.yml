@@ -58,7 +58,7 @@ jobs:
         working-directory: note-service
     name: Package and Publish Note Service
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ build ]
+    needs: [ build-note-service ]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -90,7 +90,7 @@ jobs:
         working-directory: edge-service
     name: Package and Publish Edge Service
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ build ]
+    needs: [ build-edge-service ]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
