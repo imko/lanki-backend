@@ -1,4 +1,5 @@
 server:
+  shutdown: graceful
   tomcat:
     connection-timeout: 2s
     keep-alive-timeout: 15s
