@@ -1,6 +1,14 @@
 version: "3.8"
 
 services:
+  lanki-ui:
+    image: "polar-ui"
+    container_name: "lanki-ui"
+    ports:
+      - "9004:9004" # NGINX serves the SPA on PORT 9004
+    environment:
+      - PORT=9004 # Configures the NGINX server port
+
   lanki-note-service:
     depends_on:
       - lanki-db
@@ -37,7 +45,7 @@ services:
       - "6379:6379"
 
   lanki-keycloak:
-    image: quay.io/keycloak/keycloak:19.0
+    image: quay.io/keycloak/keycloak:23.0.4
     container_name: lanki-keycloak
     command: start-dev
     environment:

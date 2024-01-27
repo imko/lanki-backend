@@ -37,8 +37,11 @@ cd /opt/keycloak/bin
   --username bjorn --new-password password
 
 ./kcadm.sh create clients -r Lanki \
-  -s clientId=edge-service \
-  -s enabled=true \
-  -s publicClient=false \
-  -s secret=lanki-keycloak-secret \
-  -s 'redirectUris=["http://localhost:9000", "http://localhost:9000/login/oauth2/code/*"]'
+  -s "clientId=edge-service" \
+  -s "enabled=true" \
+  -s "publicClient=false" \
+  -s "secret=lanki-keycloak-secret" \
+  -s 'redirectUris=["http://localhost:9000", "http://localhost:9000/login/oauth2/code/*"]' \
+
+./kcadm.sh get clients -r Lanki \
+  --fields id,clientId,name,baseUrl,publicClient,redirectUris

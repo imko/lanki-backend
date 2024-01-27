@@ -28,4 +28,6 @@ build/
 ### VS Code ###
 .vscode/
 
+### For Development ###
 /keycloak
+docker-compose.yml

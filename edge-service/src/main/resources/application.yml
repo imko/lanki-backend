@@ -14,7 +14,7 @@ spring:
     gateway:
       routes:
         - id: spa-route
-          uri: ${SPA_URL:http://localhost:9002}
+          uri: ${SPA_URL:http://localhost:9004}
           predicates:
             - Path=/,/*.css,/*.js,/favicon.ico
         - id: note-route
