@@ -1,6 +1,6 @@
 server:
   shutdown: graceful
-  port: 9090
+  port: 9000
   netty:
     connection-timeout: 2s
     idle-timeout: 15s
@@ -13,8 +13,12 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: spa-route
+          uri: ${SPA_URL:http://localhost:9002}
+          predicates:
+            - Path=/,/*.css,/*.js,/favicon.ico
         - id: note-route
-          uri: ${NOTE_SERVICE_URL:http://localhost:8080}/v1/api/notes
+          uri: ${NOTE_SERVICE_URL:http://localhost:9001}/v1/api/notes
           predicates:
             - Path=/v1/api/notes/**
           filters:
@@ -62,6 +66,20 @@ spring:
     timeout: 10m
     redis:
       namespace: lanki:edge
+  security:
+    oauth2:
+      client:
+        registration:
+          # Registration ID which is used to build URL where Spring Security
+          # received the Authorization Code from Keycloak
+          # (e.g., /login/oauth2/code/{registrationId}).
+          keycloak:
+            client-id: edge-service
+            client-secret: lanki-keycloak-secret
+            scope: openid
+        provider:
+          keycloak: # Registration ID.
+            issuer-uri: http://localhost:8080/realms/Lanki
 
 resilience4j:
   circuitbreaker:

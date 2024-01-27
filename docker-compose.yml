@@ -7,7 +7,7 @@ services:
     image: "ghcr.io/imko/lanki-backend/note-service:0.0.1-snapshot"
     container_name: lanki-note-service
     ports:
-      - "8080:8080"
+      - "9001:9001"
       - "8081:8081"
     environment:
       - BPL_JVM_THREAD_COUNT=50
@@ -35,3 +35,13 @@ services:
     container_name: lanki-redis
     ports:
       - "6379:6379"
+
+  lanki-keycloak:
+    image: quay.io/keycloak/keycloak:19.0
+    container_name: lanki-keycloak
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=user
+      - KEYCLOAK_ADMIN_PASSWORD=password
+    ports:
+      - "8080:8080"
