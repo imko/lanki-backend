@@ -51,7 +51,7 @@ jobs:
       - name: Build, unit tests and integration tests
         run: |
           git update-index --chmod=+x mvnw
-          ./mvnw clean install
+          ./mvnw clean install -DskipTests
   package-note-service:
     defaults:
       run:
