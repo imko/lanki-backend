@@ -27,7 +27,7 @@ public class UserControllerTests {
 
   @Test
   @DisplayName("Test unauthenticated user redirect")
-  public void testNotAuthenticated() {
+  public void testUnauthenticated() {
     webTestClient.get().uri("/user").exchange().expectStatus().is3xxRedirection();
   }
 
@@ -54,6 +54,7 @@ public class UserControllerTests {
               builder.claim(StandardClaimNames.PREFERRED_USERNAME, expectedUser.username());
               builder.claim(StandardClaimNames.GIVEN_NAME, expectedUser.firstName());
               builder.claim(StandardClaimNames.FAMILY_NAME, expectedUser.lastName());
+              builder.claim("roles", expectedUser.roles());
             });
   }
 }

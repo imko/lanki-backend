@@ -35,6 +35,8 @@ spring:
           max-life-time: 60s
       default-filters:
         - SaveSession
+        # Enables token relay pattern for calling downstream services.
+        - TokenRelay
         - name: RequestRateLimiter
           args:
             redis-rate-limiter:
@@ -76,7 +78,7 @@ spring:
           keycloak:
             client-id: edge-service
             client-secret: lanki-keycloak-secret
-            scope: openid
+            scope: openid,roles
         provider:
           keycloak: # Registration ID.
             issuer-uri: http://localhost:8080/realms/Lanki
