@@ -51,7 +51,7 @@ jobs:
       - name: Build, unit tests and integration tests
         run: |
           git update-index --chmod=+x mvnw
-          ./mvnw clean install -DskipTests
+          ./mvnw clean install
   package-note-service:
     defaults:
       run:
@@ -108,7 +108,7 @@ jobs:
       - name: Build container image
         run: |
           git update-index --chmod=+x mvnw
-          ./mvnw spring-boot:build-image -DskipTests -DregistryUsername=${{ github.actor }} -DregistryPassword=${{ secrets.GITHUB_TOKEN }}
+          ./mvnw spring-boot:build-image -DregistryUsername=${{ github.actor }} -DregistryPassword=${{ secrets.GITHUB_TOKEN }}
       - name: OCI image vulnerability scanning
         uses: anchore/scan-action@v3
         id: scan
