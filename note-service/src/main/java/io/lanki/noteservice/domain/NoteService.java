@@ -38,6 +38,8 @@ public class NoteService {
                       .url(note.getUrl())
                       .createdDate(existingNote.getCreatedDate())
                       .lastModifiedDate(existingNote.getLastModifiedDate())
+                      .createdBy(existingNote.getCreatedBy())
+                      .lastModifiedBy(existingNote.getLastModifiedBy())
                       .version(existingNote.getVersion())
                       .build();
               return noteRepository.save(noteToUpdate);

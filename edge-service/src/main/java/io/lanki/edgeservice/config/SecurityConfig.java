@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.server.WebSessionServerOAuth2AuthorizedClientRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
 import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
@@ -87,7 +89,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  WebFilter csrfCookieWebFilter() {
+  public WebFilter csrfCookieWebFilter() {
     return (exchange, chain) -> {
       Mono<CsrfToken> csrfToken =
           exchange.getAttributeOrDefault(CsrfToken.class.getName(), Mono.empty());
@@ -98,6 +100,11 @@ public class SecurityConfig {
               })
           .then(chain.filter(exchange));
     };
+  }
+
+  @Bean
+  public ServerOAuth2AuthorizedClientRepository serverOAuth2AuthorizedClientRepository() {
+    return new WebSessionServerOAuth2AuthorizedClientRepository();
   }
 
   private ServerLogoutSuccessHandler oidcLogoutSuccessHandler(

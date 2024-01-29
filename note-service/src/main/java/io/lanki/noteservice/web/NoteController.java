@@ -48,4 +48,15 @@ public class NoteController {
   public void delete(@PathVariable("id") Long id) {
     noteService.delete(id);
   }
+
+  /* For temporary testing routes */
+  @GetMapping("/basic")
+  public String getBasic() {
+    return "Only for basic users!";
+  }
+
+  @GetMapping("/premium")
+  public String getPremium() {
+    return "Only for premium users!";
+  }
 }

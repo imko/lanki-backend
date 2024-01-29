@@ -1,30 +1,41 @@
 package io.lanki.edgeservice;
 
+import com.redis.testcontainers.RedisContainer;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 class EdgeServiceApplicationTests {
 
   private static final int REDIS_PORT = 6379;
 
   @Container
-  static GenericContainer<?> redis =
-      new GenericContainer<>(DockerImageName.parse("redis:7.0")).withExposedPorts(REDIS_PORT);
+  private static RedisContainer container =
+      new RedisContainer(RedisContainer.DEFAULT_IMAGE_NAME.withTag(RedisContainer.DEFAULT_TAG));
 
   @DynamicPropertySource
   static void redisProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.redis.host", () -> redis.getHost());
-    registry.add("spring.redis.port", () -> redis.getMappedPort(REDIS_PORT));
+    registry.add("spring.redis.host", () -> container.getHost());
+    registry.add("spring.redis.port", () -> container.getMappedPort(REDIS_PORT));
   }
 
   @Test
-  void verifyThatSpringContextLoads() {}
+  @DisplayName("Test Redis connection")
+  void testRedisConnection() {
+    // Retrieve the Redis URI from the container
+    String redisURI = container.getRedisURI();
+    RedisClient client = RedisClient.create(redisURI);
+    try (StatefulRedisConnection<String, String> connection = client.connect()) {
+      RedisCommands<String, String> commands = connection.sync();
+      Assertions.assertEquals("PONG", commands.ping());
+    }
+  }
 }

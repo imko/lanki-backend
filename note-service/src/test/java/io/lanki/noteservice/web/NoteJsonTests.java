@@ -30,6 +30,8 @@ public class NoteJsonTests {
             .url("url")
             .createdDate(now)
             .lastModifiedDate(now)
+            .createdBy("bob")
+            .lastModifiedBy("bob")
             .version(1)
             .build();
     var jsonContent = jacksonTester.write(note);
@@ -54,6 +56,12 @@ public class NoteJsonTests {
     assertThat(jsonContent)
         .extractingJsonPathStringValue("@.last_modified_date")
         .isEqualTo(note.getLastModifiedDate().toString());
+    assertThat(jsonContent)
+        .extractingJsonPathStringValue("@.created_by")
+        .isEqualTo(note.getCreatedBy());
+    assertThat(jsonContent)
+        .extractingJsonPathStringValue("@.last_modified_by")
+        .isEqualTo(note.getLastModifiedBy());
     assertThat(jsonContent).extractingJsonPathNumberValue("@.version").isEqualTo(note.getVersion());
   }
 
@@ -73,6 +81,8 @@ public class NoteJsonTests {
             "url": "url",
             "created_date": "2024-06-08T06:08:37.135029Z",
             "last_modified_date": "2024-06-08T06:08:37.135029Z",
+            "created_by": "bob",
+            "last_modified_by": "bob",
             "version": 1
           }
         """;
@@ -88,6 +98,8 @@ public class NoteJsonTests {
             .url("url")
             .createdDate(instant)
             .lastModifiedDate(instant)
+            .createdBy("bob")
+            .lastModifiedBy("bob")
             .version(1)
             .build();
 
