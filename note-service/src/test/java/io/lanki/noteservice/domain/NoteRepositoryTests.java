@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
@@ -103,8 +104,8 @@ public class NoteRepositoryTests {
   }
 
   @Test
-  @DisplayName("Test save note")
-  public void testSave() {
+  @DisplayName("Test save note unauthenticated")
+  public void testSaveUnauthenticated() {
     var note =
         Note.builder().title("title").content("content").type(NoteType.PERSONAL).score(100).build();
 
@@ -114,6 +115,25 @@ public class NoteRepositoryTests {
     assertThat(result.getContent()).isEqualTo(note.getContent());
     assertThat(result.getType()).isEqualTo(note.getType());
     assertThat(result.getScore()).isEqualTo(note.getScore());
+    assertThat(result.getCreatedBy()).isNull();
+    assertThat(result.getLastModifiedBy()).isNull();
+  }
+
+  @Test
+  @DisplayName("Test save note authenticated")
+  @WithMockUser("bob")
+  public void testSaveAuthenticated() {
+    var note =
+        Note.builder().title("title").content("content").type(NoteType.PERSONAL).score(100).build();
+
+    Note result = noteRepository.save(note);
+
+    assertThat(result.getTitle()).isEqualTo(note.getTitle());
+    assertThat(result.getContent()).isEqualTo(note.getContent());
+    assertThat(result.getType()).isEqualTo(note.getType());
+    assertThat(result.getScore()).isEqualTo(note.getScore());
+    assertThat(result.getCreatedBy()).isEqualTo("bob");
+    assertThat(result.getLastModifiedBy()).isEqualTo("bob");
   }
 
   @Test
